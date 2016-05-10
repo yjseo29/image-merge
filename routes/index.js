@@ -11,17 +11,42 @@ router.get('/', function(req, res, next) {
 });
 
 router.post('/', upload.array('images', 20), function(req, res, next) {
-	for(var i in req.files){
-		console.log(req.files[i]);
+	var outputFileName = new Date().getTime()+".jpg";
+	var marginPx = "x"+req.body.margin;
+	var qualityVal = parseInt(req.body.quality);
+	var sharpenVal = req.body.sharpen;
+
+	if(req.body.append == "+append"){
+		marginPx = req.body.margin+"x";
 	}
-	gm(req.files[0].path)
-		.quality(80)
-		.resize(1024, 1024)
-		.autoOrient()
-		.write('./public/uploads/output.jpg', function (err) {
-			if (err) console.log(err);
-		});
-	res.json(req.files);
+	var img = gm().out("-size", marginPx);
+
+	for(var i=0;i<req.files.length;i++){
+		if(i != req.files.length-1){
+			img.out(req.files[i].path).out("xc:none");
+		}else{
+			img.out(req.files[i].path);
+		}
+	}
+
+	img.out(req.body.append)
+		.sharpen(sharpenVal)
+		.quality(qualityVal)
+		.fontSize(100)
+		.drawText(0, 0, 'from scratch', 'Center')
+		.write("./public/output/"+outputFileName, function (err) {
+		if (err) console.log(err);
+		res.redirect("output/"+outputFileName);
+	});
+
 });
+
+function randomString(){
+	var text = "";
+	var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+	for( var i=0; i < 6; i++ ) text += possible.charAt(Math.floor(Math.random() * possible.length));
+
+	return text;
+}
 
 module.exports = router;

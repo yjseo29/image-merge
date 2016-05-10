@@ -10,12 +10,35 @@
 		<title>Image Merge</title>
 	</head>
 	<body>
-		<form action="/" method="post" enctype="multipart/form-data">
+		<form id="form" target="_blank" action="/" method="post" enctype="multipart/form-data">
+			<label><input type="radio" name="append" value="+append" checked>가로</label>
+			<label><input type="radio" name="append" value="-append">세로</label>
 			<input type="file" name="images" accept="image/*">
 			<input type="file" name="images" accept="image/*">
 			<input type="file" name="images" accept="image/*">
 			<input type="file" name="images" accept="image/*">
-			<button type="submit">전송</button>
+			<button type="button" onclick="fileCheck()">전송</button>
+			<div>
+				<input type="number" name="margin" value="30" min="1">
+				<input type="number" name="quality" value="100" min="1" max="100">
+				<select name="sharpen">
+					<option value="0">기본</option>
+					<option value="1">1</option>
+					<option value="10">10</option>
+				</select>
+			</div>
 		</form>
+		<script src="https://code.jquery.com/jquery-1.12.3.min.js"></script>
+		<script>
+			function fileCheck(){
+				var uploadSize = 0;
+				$("input[name*='images']").each(function(){
+					uploadSize += this.files.length;
+				});
+				if(uploadSize > 1){
+					$("#form").submit();
+				}
+			}
+		</script>
 	</body>
 </html>
